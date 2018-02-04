@@ -1,0 +1,32 @@
+<!DOCTYPE html5>
+<html>
+	<head>
+		<title>BUSINESS RECOMMENDER SYSTEM</title>
+		<link rel="stylesheet" type="text/css" href="../css/main.css">
+		<script src="../js/googlemap_js.js"></script>
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+		<!--script for the polygon drawing-->
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4s21v6vyCWumMe2aZpJtlbnjaQ0NGUhY&libraries=places,drawing,geometry" type="text/javascript"></script>
+	</head>
+	<body onload="javascript:onStart();">
+		<header>
+			<span>Business Recommender System</span>
+		</header>
+		<span id="mapsearchboxspan">
+			<input  type="text" id="mapsearchbox" class="mapsearchbox" placeholder="Enter the Location">
+		</span>
+		<section id="map" class="map">	</section>
+		<section id="currentaddress"></section>
+		<section id="placeDetails"> </section>
+		<section id="info"></section>
+		<br><br><br>
+		<span>Distance Measurement</span>
+		<select id="distancecalculate">
+       		 <option value="">select the region</option>
+    	</select>
+    	<button type="button" onclick="javascript:distanceCalculation()">OK</button>
+    	<br><br>
+    	<span>Calculation Of Distance from the Selected Region<span>
+    	<section id='distancemeasured'></section>
+	</body>
+</html>

@@ -1,0 +1,38 @@
+header{ 
+	background:#795548;
+	font-family:Trebuchet MS;
+	color:white;
+	font-size:40px;
+	height:60px;
+	width: 100%;
+	text-align:right;
+	padding:10px 10px;
+	margin:0px;
+	position:fixed;
+	top:0px;
+	left:0;
+	z-index: 2;
+}
+.map{
+	height: 600px;
+	width: 800px;
+	margin-top: 100px;
+	padding: 10px;
+}
+.info {
+    position: absolute;
+    font-family: arial, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+}
+.mapsearchbox{
+	height: 20px;
+	margin-top: 0px;
+	float: left;
+	autocomplete: 'on';
+}
+.button{
+	height: 20px;
+	margin-top: 0px;
+	float: left;
+}
