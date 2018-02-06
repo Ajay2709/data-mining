@@ -1,18 +1,15 @@
 {
   "name": "node_learning",
   "version": "1.0.0",
-  "description": "socsite",
+  "description": "businessrecommender",
   "main": "index.js",
   "dependencies": {
-    "body": "^5.1.0",
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
     "express-session": "^1.15.6",
     "mongodb": "^2.2.33",
-    "multer": "^1.3.0",
-    "mysql": "^2.15.0",
-    "parser": "^0.1.4"
+    "multer": "^1.3.0"
   },
   "devDependencies": {
     "accepts": {

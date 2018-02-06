@@ -7,6 +7,9 @@ var markers=[];
 var dropdownlatitude=[];//variable used in distance measurement
 var dropdownlongitude=[];
 var dropdownname = [];
+var currentPlace;
+
+
 	//function to calculate the current position
 	//start the map with the current location
 	function onStart(){
@@ -106,11 +109,11 @@ var dropdownname = [];
 			$("#placeDetails").empty();
 
 			//places will contain all the places from the user details
-			var places = searchBox.getPlaces();
+			places = searchBox.getPlaces();
 			if (places.length == 0) {
 				return;
 			}
-			
+			console.log("places:"+typeof places);
 			// Clear out the old markers.
 			markers.forEach(function(marker) {
 				console.log("searching");
@@ -126,6 +129,10 @@ var dropdownname = [];
 					console.log("Returned place contains no geometry");
 					return;
 				}
+				//console.log(JSON.stringify(place));
+				//places.push(place);
+				currentPlace = place;
+				insertPlacesAjax();
 				
 				//it is hard to retrieve place.geometry.location.lat
 				//so we are parsing place.geometry.location
@@ -179,6 +186,7 @@ var dropdownname = [];
 					  bounds.extend(place.geometry.location);
 				}
 			});
+
 
 			//to clear the text field after locations are found
 			 document.getElementById("mapsearchbox").value = "";
@@ -326,3 +334,19 @@ var dropdownname = [];
     {
         return Value * Math.PI / 180;
     }
+    function insertPlacesAjax(){
+    	console.log("in insertPlacesAjax()");
+    	$.ajax({
+		url : 'insertPlacesService',
+		headers : { "Content-Type":"application/json"},
+		type : 'POST',
+		data : JSON.stringify(currentPlace),
+		success : function(){
+		console.log("return to ajax call success");//JSON.stringify(userdata)
+			//location.reload();
+		},
+		error:function(){
+			console.log("return to ajax call failure");//JSON.stringify(userdata)
+		}
+	});
+}

@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var app = express();
 var path = require("path");
+var insertDb = require('./modules/insertPlacesDb.js');
 app.set('port', (process.env.PORT || 8090));
 app.use(cookieParser());
 app.use(express.static('WebContent'));
@@ -33,4 +34,15 @@ var server = app.listen(app.get('port'), function () {
    var port = server.address().port;
    
    console.log("Example app listening at http://%s:%s", host, port);
+});
+app.post('/insertPlacesService', function(req, res){
+  console.log("at insertPlacesService"+req);
+  var data = req.body;
+  //console.log("req: in insertPlacesService"+JSON.stringify(data));
+  //var places = JSON.stringify()
+  insertDb.insertPlaces(data, res, function(result, response){
+            if(result) response.send({"status":"success"});
+            else response.send({"status":"error"});
+     
+            });
 });
