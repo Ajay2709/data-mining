@@ -1,4 +1,3 @@
-var geocoder;
 var map;
 var polygonArray = [];
 var drawingManager;
@@ -8,7 +7,8 @@ var dropdownlatitude=[];//variable used in distance measurement
 var dropdownlongitude=[];
 var dropdownname = [];
 var currentPlace;
-
+var directionsService;
+var directionsDisplay;
 
 	//function to calculate the current position
 	//start the map with the current location
@@ -20,10 +20,11 @@ var currentPlace;
 		});
 
 		//used to calculate the address from the derived location(latitude and longitude).This variable
-		//is used in various parts of the js `
+		//is used in various parts of the js 
 		currgeocoder = new google.maps.Geocoder();
 		var infoWindow = new google.maps.InfoWindow;
-
+		directionsService = new google.maps.DirectionsService();
+		    directionsDisplay = new google.maps.DirectionsRenderer({ 'draggable': true });
 			//str to store the current latitude and longitude
 			var str="";
 
@@ -308,31 +309,47 @@ var currentPlace;
 		var nameofvalue=dropdownname[indexofvalue];
 		for(var i=0;i<dropdownlongitude.length;i++){
 			if(i==indexofvalue) continue;
-			var kms = calcDistance(dropdownlatitude[indexofvalue],dropdownlongitude[indexofvalue],dropdownlatitude[i],dropdownlongitude[i]);
-			document.getElementById('distancemeasured').innerHTML +=nameofvalue+"-->"+dropdownname[i]+"  is "+parseFloat(kms.toFixed(2))+" kms "+ "<br>";
+			//document.getElementById('distancemeasured').innerHTML +=nameofvalue+"-->"+dropdownname[i]+"  is "+ "<br>";
+			calcDistance(dropdownlatitude[indexofvalue],dropdownlongitude[indexofvalue],dropdownlatitude[i],dropdownlongitude[i],nameofvalue,dropdownname[i]);
 		}
 		
     }
 
     //function which returns the distance in kms
-    function calcDistance(lat1, lon1, lat2, lon2) 
-    {
-      var R = 6371; // km
-      var dLat = toRad(lat2-lat1);
-      var dLon = toRad(lon2-lon1);
-      var lat1 = toRad(lat1);
-      var lat2 = toRad(lat2);
-      var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
-      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-      var d = R * c;
-      return d;
-    }
-
-    // Converts numeric degrees to radians
-    function toRad(Value) 
-    {
-        return Value * Math.PI / 180;
+    function calcDistance(lat1, lon1, lat2, lon2, source_name,destination_name) {
+    	console.log("entering");
+        var source = new google.maps.LatLng(lat1,lon1);
+        var destination = new google.maps.LatLng(lat2,lon2);
+        var request = {
+	        origin: source,
+	        destination: destination,
+	        travelMode: google.maps.TravelMode.DRIVING
+    	};
+	    directionsService.route(request, function (response, status) {
+	        if (status == google.maps.DirectionsStatus.OK) {
+	            directionsDisplay.setDirections(response);
+	        }
+	    });
+ 
+	    var service = new google.maps.DistanceMatrixService();
+	    service.getDistanceMatrix({
+	        origins: [source],
+	        destinations: [destination],
+	        travelMode: google.maps.TravelMode.DRIVING,
+	        unitSystem: google.maps.UnitSystem.METRIC,
+	        avoidHighways: false,
+	        avoidTolls: false
+	    }, function (response, status) {
+	        if (status == google.maps.DistanceMatrixStatus.OK && response.rows[0].elements[0].status != "ZERO_RESULTS") {
+	            var distance = response.rows[0].elements[0].distance.text;
+	            var duration = response.rows[0].elements[0].duration.text;
+	            document.getElementById("distancemeasured").innerHTML  +=source_name+" ----> "+destination_name+"<br>" 
+	            + "Distance "+distance+"   "+"Duration "+duration+"<br>";     
+	        } else {
+	            alert("Unable to find the distance via road.");
+	        }
+	    });
+    	
     }
     function insertPlacesAjax(){
     	console.log("in insertPlacesAjax()");
@@ -350,3 +367,4 @@ var currentPlace;
 		}
 	});
 }
+
