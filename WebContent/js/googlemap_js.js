@@ -13,6 +13,7 @@ var directionsDisplay;
 	//function to calculate the current position
 	//start the map with the current location
 	function onStart(){
+		console.log("entering...");
 		map = new google.maps.Map(document.getElementById('map'), {
 			zoom: 10,
 			center: {lat: 222.72, lng: 232.56},
@@ -20,7 +21,7 @@ var directionsDisplay;
 		});
 
 		//used to calculate the address from the derived location(latitude and longitude).This variable
-		//is used in various parts of the js 
+		//is used in various parts of the js
 		currgeocoder = new google.maps.Geocoder();
 		var infoWindow = new google.maps.InfoWindow;
 		directionsService = new google.maps.DirectionsService();
@@ -31,17 +32,17 @@ var directionsDisplay;
 	        // geolocation helps in determining the current location
 	        if (navigator.geolocation) {
 		        navigator.geolocation.getCurrentPosition(function(position) {
-			           
+
 			           //setting the window to current position
 			            var pos = {
 				            lat: position.coords.latitude,
 				            lng: position.coords.longitude
 			            };
 			            infoWindow.setPosition(pos);
-
+								   console.log("entering2s...");
 			            //setting content to the current location
 			            infoWindow.setContent('current location ');
-				       
+
 				      	//latitude and longitude should be in the format of new google.maps.LatLng(lat,lng)
 				        var latlng = new google.maps.LatLng(parseFloat(pos.lat), parseFloat(pos.lng));
 
@@ -51,20 +52,20 @@ var directionsDisplay;
 			            infoWindow.open(map);
 			            map.setCenter(pos);
 			            //calls the search box
-			            onclickSearchBox();
+			            //onclickSearchBox();
 			            //calls the drawing manager
 			            displayDrawManager();
-			          }, 
+			          },
 		          function() {
 		            	handleLocationError(true, infoWindow, map.getCenter());
 		          });
-	        } 
+	        }
 	        else{
 
 	          // Browser doesn't support Geolocation
 	          //function call to handle the error if the geolocation doesn't occurs
 	          	handleLocationError(false, infoWindow, map.getCenter());
-	        }    
+	        }
 	}
 
 	//function to handle error if current location doesn't calculate
@@ -79,18 +80,19 @@ var directionsDisplay;
 	//function which works when the search button is clicked
 	function onclickSearchBox(){
 		//get the input from the user
-		//searchBox will contain nothing 
-		var mapsearchplace = document.getElementById('mapsearchbox');
-		
-		//Place Change Event On the Search Box .It will be entered by the user.map will contain the structure
-		//map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapsearchplace);
-		var searchBox = new google.maps.places.SearchBox(mapsearchplace);
-				
+		//searchBox will contain nothing
+		var mapSearchPlace = document.getElementById('searchType')+" in "+document.getElementById('searchPlace');
+		//console.log("mapSearchPlace:"+mapSearchPlace.value);
+
+		//Place Change Event On the Search Box .It will be entered by the user.map will contain the struc1ture
+		//map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapSearchPlace);
+		var searchBox = new google.maps.places.SearchBox(mapSearchPlace);
+
         // Bias the SearchBox results towards current map's viewport.
         map.addListener('bounds_changed', function() {
           searchBox.setBounds(map.getBounds());
         });
-		
+
         // Listen for the event fired when the user selects a prediction and retrieve more details for that place.
         searchBox.addListener('places_changed', function() {
 			var i=0,j=0,k=0;
@@ -114,7 +116,7 @@ var directionsDisplay;
 			if (places.length == 0) {
 				return;
 			}
-			console.log("places:"+typeof places);
+			//console.log("places:"+typeof places);
 			// Clear out the old markers.
 			markers.forEach(function(marker) {
 				console.log("searching");
@@ -133,8 +135,11 @@ var directionsDisplay;
 				//console.log(JSON.stringify(place));
 				//places.push(place);
 				currentPlace = place;
+				console.log("\nformatted address =  "+place.formatted_address+"\n");
+				var keywords = mapSearchPlace.split(" ");
+				if(!currentPlace.formatted_address.contains(keywords[0])||(keywords.length>1 && currentPlace.formatted_address.contains(keywords[1])))continue;
 				insertPlacesAjax();
-				
+
 				//it is hard to retrieve place.geometry.location.lat
 				//so we are parsing place.geometry.location
 				var latlnglist = (JSON.stringify(place.geometry.location));
@@ -151,11 +156,11 @@ var directionsDisplay;
 
 				// Append that to the DropDownList.
 				$('#distancecalculate').append(newOption);
-				
+
 				placeNameAndAddress += "<section class='postPlaceDetails' id = 'places'>\
 								<div> <b><i>"+place.name+"</b></i> <br>"+place.formatted_address+"</div> <br>\
 								</section>";
-									
+
 				//for selecting the icon for marker through online
 				var iconBase = 'https://maps.google.com/mapfiles/kml/shapes/';
 
@@ -171,19 +176,19 @@ var directionsDisplay;
 				if (place.geometry.viewport) {
 					// Only geocodes have viewport
 					/*
-							Viewport contains the recommended viewport for displaying the returned result, 
-						specified as two latitude, longitude values defining the southwest and northeast corner 
+							Viewport contains the recommended viewport for displaying the returned result,
+						specified as two latitude, longitude values defining the southwest and northeast corner
 						of the viewport bounding box. Generally the viewport is used to frame a result when displaying it to a user.
 
-							Bounds stores the bounding box which can fully contain the returned result. 
-						Note that these bounds may not match the recommended viewport. 
-						(For example, San Francisco includes the Farallon islands, which are technically part of the city, 
+							Bounds stores the bounding box which can fully contain the returned result.
+						Note that these bounds may not match the recommended viewport.
+						(For example, San Francisco includes the Farallon islands, which are technically part of the city,
 						but probably should not be returned in the viewport)
 					*/
-					
+
 					bounds.union(place.geometry.viewport);
-				} 
-				else{ 
+				}
+				else{
 					  bounds.extend(place.geometry.location);
 				}
 			});
@@ -220,7 +225,7 @@ var directionsDisplay;
 			    zIndex: 1
 			}
 		});
-		//setting the drawing manager to the map 
+		//setting the drawing manager to the map
 		drawingManager.setMap(map);
 		drawPolygon();
 	}
@@ -248,7 +253,7 @@ var directionsDisplay;
 
 			    	//polstr is the variable to store latitude and longitude form the polygon points formed
 			    	var polygonStr=polygon.getPath().getAt(i).toUrlValue(6);
-			    	
+
 			        //spliting the longitude and latitude from the string
 				    var polygonlatlngstr = polygonStr.split(',',2);
 
@@ -258,7 +263,7 @@ var directionsDisplay;
 				    //to print the address from the formed polygon points
 				    currgeocoder.geocode({
 			       		'location': polygonlatlng
-			        },  
+			        },
 			        function(results, status) {
 			            if (status == google.maps.GeocoderStatus.OK) {
 			            	 document.getElementById('info').innerHTML += results[0].formatted_address + "<br>";
@@ -283,7 +288,7 @@ var directionsDisplay;
 	function getCurrentAddress(location) {
         currgeocoder.geocode({
        		'location': location
-        },  
+        },
         function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
                 $("#currentaddress").html(results[0].formatted_address);
@@ -301,7 +306,7 @@ var directionsDisplay;
     	$("#distancemeasured").empty();
     	var selectedname = document.getElementById('distancecalculate');
     	var selectednamevalue = selectedname.options[selectedname.selectedIndex].value;
-    	
+
     	//splits the value (string of numbers and characters) into numbers
     	var splits = selectednamevalue.split(/(\d{1,})/);
 		var indexofvalue = splits[1];
@@ -312,7 +317,7 @@ var directionsDisplay;
 			//document.getElementById('distancemeasured').innerHTML +=nameofvalue+"-->"+dropdownname[i]+"  is "+ "<br>";
 			calcDistance(dropdownlatitude[indexofvalue],dropdownlongitude[indexofvalue],dropdownlatitude[i],dropdownlongitude[i],nameofvalue,dropdownname[i]);
 		}
-		
+
     }
 
     //function which returns the distance in kms
@@ -330,7 +335,7 @@ var directionsDisplay;
 	            directionsDisplay.setDirections(response);
 	        }
 	    });
- 
+
 	    var service = new google.maps.DistanceMatrixService();
 	    service.getDistanceMatrix({
 	        origins: [source],
@@ -343,13 +348,13 @@ var directionsDisplay;
 	        if (status == google.maps.DistanceMatrixStatus.OK && response.rows[0].elements[0].status != "ZERO_RESULTS") {
 	            var distance = response.rows[0].elements[0].distance.text;
 	            var duration = response.rows[0].elements[0].duration.text;
-	            document.getElementById("distancemeasured").innerHTML  +=source_name+" ----> "+destination_name+"<br>" 
-	            + "Distance "+distance+"   "+"Duration "+duration+"<br>";     
+	            document.getElementById("distancemeasured").innerHTML  +=source_name+" ----> "+destination_name+"<br>"
+	            + "Distance "+distance+"   "+"Duration "+duration+"<br>";
 	        } else {
 	            alert("Unable to find the distance via road.");
 	        }
 	    });
-    	
+
     }
     function insertPlacesAjax(){
     	console.log("in insertPlacesAjax()");
@@ -367,4 +372,3 @@ var directionsDisplay;
 		}
 	});
 }
-

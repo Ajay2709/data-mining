@@ -1,4 +1,4 @@
-header{ 
+header{
 	background:#795548;
 	font-family:Trebuchet MS;
 	color:white;
@@ -28,7 +28,6 @@ header{
 .mapsearchbox{
 	height: 20px;
 	margin-top: 0px;
-	float: left;
 	autocomplete: 'on';
 }
 .button{
